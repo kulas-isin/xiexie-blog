@@ -1,0 +1,151 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog');
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<Layout title={entry.data.title}>
+  <style>
+    .back-link {
+      display: inline-block;
+      margin-bottom: 2rem;
+      padding: 0.6rem 1.2rem;
+      background: var(--color-accent-brown);
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+      background: var(--color-accent-green);
+      transform: translateX(-4px);
+    }
+
+    .article-header {
+      margin-bottom: 2rem;
+    }
+
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-text);
+      font-weight: 400;
+    }
+
+    .article-meta {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .article-date {
+      font-style: italic;
+    }
+
+    .article-tag {
+      display: inline-block;
+      padding: 0.25rem 0.8rem;
+      background: rgba(143, 184, 159, 0.15);
+      color: var(--color-accent-green);
+      border-radius: 15px;
+      font-size: 0.85rem;
+    }
+
+    .article-content {
+      font-size: 1rem;
+      color: var(--color-text);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .article-content :global(p) {
+      margin-bottom: 1.5rem;
+    }
+
+    .article-content :global(h2) {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      margin: 2rem 0 1rem 0;
+      color: var(--color-text);
+    }
+
+    .article-content :global(h3) {
+      font-size: 1.3rem;
+      margin: 1.5rem 0 0.8rem 0;
+      color: var(--color-text);
+    }
+
+    .article-content :global(a) {
+      color: var(--color-accent-brown);
+      text-decoration: underline;
+    }
+
+    .article-content :global(a:hover) {
+      color: var(--color-accent-green);
+    }
+
+    .article-content :global(ul),
+    .article-content :global(ol) {
+      margin: 1rem 0 1rem 2rem;
+    }
+
+    .article-content :global(li) {
+      margin-bottom: 0.5rem;
+    }
+
+    .article-image {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      margin: 2rem 0;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .article-title {
+        font-size: 1.6rem;
+      }
+
+      .article-content :global(h2) {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+
+  <a href="/" class="back-link">← 回到列表</a>
+
+  <article class="article-header">
+    <h1 class="article-title">{entry.data.title}</h1>
+    <div class="article-meta">
+      <span class="article-date">{new Date(entry.data.date).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      <span class="article-tag">{entry.data.tag}</span>
+    </div>
+  </article>
+
+  <div class="article-content">
+    <Content />
+  </div>
+
+  {entry.data.image && (
+    <img src={`/blog/${entry.slug}/${entry.data.image}`} alt={entry.data.title} class="article-image" />
+  )}
+</Layout>

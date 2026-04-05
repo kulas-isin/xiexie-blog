@@ -1,0 +1,230 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+const allPosts = (await getCollection('blog')).sort(
+  (a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf()
+);
+
+const tags = ['全部', ...new Set(allPosts.map(post => post.data.tag))];
+---
+
+<Layout title="寫寫">
+  <style>
+    .tags-filter {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tag-btn {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--color-border);
+      background: white;
+      color: var(--color-text);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 20px;
+      font-family: var(--font-body);
+    }
+
+    .tag-btn:hover,
+    .tag-btn.active {
+      background: var(--color-accent-brown);
+      color: white;
+      border-color: var(--color-accent-brown);
+      transform: translateY(-2px);
+    }
+
+    .tag-btn.active {
+      background: var(--color-accent-green);
+      border-color: var(--color-accent-green);
+    }
+
+    .articles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .article-card {
+      padding: 0;
+      background: white;
+      border-left: 3px solid var(--color-accent-brown);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .article-card:hover {
+      background: var(--color-hover);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-left-color: var(--color-accent-green);
+      transform: translateX(4px);
+    }
+
+    .article-card-image {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .article-card-content {
+      padding: 2rem;
+    }
+
+    .article-meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--color-text-light);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .article-date {
+      font-style: italic;
+    }
+
+    .article-tag {
+      display: inline-block;
+      padding: 0.25rem 0.8rem;
+      background: rgba(143, 184, 159, 0.15);
+      color: var(--color-accent-green);
+      border-radius: 15px;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .article-card:hover .article-tag {
+      background: var(--color-accent-green);
+      color: white;
+    }
+
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--color-text);
+      margin-bottom: 0.8rem;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .article-excerpt {
+      color: var(--color-text-light);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .read-more {
+      color: var(--color-accent-brown);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .read-more:hover {
+      color: var(--color-accent-green);
+      transform: translateX(4px);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .article-card {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .article-card:nth-child(1) { animation-delay: 0.1s; }
+    .article-card:nth-child(2) { animation-delay: 0.2s; }
+    .article-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @media (max-width: 768px) {
+      .article-title {
+        font-size: 1.3rem;
+      }
+
+      .article-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+
+      .article-card-image {
+        height: 180px;
+      }
+    }
+  </style>
+
+  <div class="tags-filter" id="tagsFilter">
+    {tags.map(tag => (
+      <button class={`tag-btn ${tag === '全部' ? 'active' : ''}`} data-tag={tag === '全部' ? 'all' : tag}>
+        {tag}
+      </button>
+    ))}
+  </div>
+
+  <div class="articles-list" id="articlesList">
+    {allPosts.map((post, index) => (
+      <a href={`/blog/${post.slug}/`} class="article-card">
+        {post.data.image && (
+          <img src={`/blog/${post.slug}/${post.data.image}`} alt={post.data.title} class="article-card-image" />
+        )}
+        <div class="article-card-content">
+          <div class="article-meta">
+            <span class="article-date">{new Date(post.data.date).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span class="article-tag">{post.data.tag}</span>
+          </div>
+          <h3 class="article-title">{post.data.title}</h3>
+          <p class="article-excerpt">{post.data.excerpt}</p>
+          <span class="read-more">繼續閱讀 →</span>
+        </div>
+      </a>
+    ))}
+  </div>
+
+  <script>
+    const tagBtns = document.querySelectorAll('.tag-btn');
+    const articlesList = document.getElementById('articlesList');
+
+    tagBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tagBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const selectedTag = btn.dataset.tag;
+        const allCards = articlesList.querySelectorAll('.article-card');
+
+        allCards.forEach(card => {
+          const tagElement = card.querySelector('.article-tag');
+          const cardTag = tagElement.textContent;
+
+          if (selectedTag === 'all' || cardTag === selectedTag) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</Layout>
