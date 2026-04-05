@@ -186,9 +186,9 @@ const tags = ['全部', ...new Set(allPosts.map(post => post.data.tag))];
   <div class="articles-list" id="articlesList">
     {allPosts.map((post, index) => (
       <a href={`/blog/${post.slug}/`} class="article-card">
-        {post.data.image && (
-          <img src={`/blog/${post.slug}/${post.data.image}`} alt={post.data.title} class="article-card-image" />
-        )}
+      {post.data.image && (
+  <img src={post.data.image} alt={post.data.title} class="article-card-image" />
+)}
         <div class="article-card-content">
           <div class="article-meta">
             <span class="article-date">{new Date(post.data.date).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
