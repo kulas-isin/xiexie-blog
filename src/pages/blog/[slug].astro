@@ -146,6 +146,6 @@ const { Content } = await entry.render();
   </div>
 
   {entry.data.image && (
-    <img src={`/blog/${entry.slug}/${entry.data.image}`} alt={entry.data.title} class="article-image" />
+    <img src={entry.data.image} alt={entry.data.title} class="article-image" />
   )}
 </Layout>
