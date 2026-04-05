@@ -2,7 +2,7 @@
 title: "有真與有真 —— 兩種方式去說一個傷痛的故事"
 date: 2026-04-05
 tag: "日常"
-image: "./you-zhen-yu-you-zhen.jpeg"
+image: "you-zhen-yu-you-zhen.jpeg"
 excerpt: "看了音樂劇《有真與有真》後，在想為什麼同樣是關於兒童性暴力的故事，卻能用完全不同的調性去訴說。"
 ---
 
